@@ -1,4 +1,4 @@
-# Vi-Notes (Fork / Partial Implementation)
+# Vi-Notes
 
 This repository is forked from [vicharanashala/vi-notes](https://github.com/vicharanashala/vi-notes) and currently contains a partial implementation of the original vision.
 
