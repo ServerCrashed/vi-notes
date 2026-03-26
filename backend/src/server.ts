@@ -11,7 +11,7 @@ const app = express();
 const port = Number(process.env.PORT || 4000);
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
-app.use(cors({ origin: corsOrigin }));
+app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
@@ -28,12 +28,10 @@ async function startServer(): Promise<void> {
 	});
 }
 
-try {
-    startServer()
-} catch (error) {
+startServer().catch((error)=>{
 	console.error('Failed to start backend:', error);
     process.exit(1);
-}
+});
 
 process.on('SIGINT', async () => {
 	await closeDb();

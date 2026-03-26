@@ -4,7 +4,7 @@ import { loginUser } from '../api/client';
 import Header from '../components/Header';
 
 type LoginPageProps = {
-  onLoggedIn: (token: string) => void;
+  onLoggedIn: () => void;
 };
 
 export default function LoginPage({ onLoggedIn }: LoginPageProps) {
@@ -20,9 +20,8 @@ export default function LoginPage({ onLoggedIn }: LoginPageProps) {
     setLoading(true);
 
     try {
-      const response = await loginUser(email, password);
-      localStorage.setItem('vi_notes_token', response.token);
-      onLoggedIn(response.token);
+      await loginUser(email, password);
+      onLoggedIn();
       navigate('/editor');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');

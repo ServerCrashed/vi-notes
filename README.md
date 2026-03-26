@@ -67,6 +67,7 @@ Set values in backend/.env:
 - JWT_SECRET
 - PORT
 - CORS_ORIGIN
+- AUTH_COOKIE_NAME (optional)
 
 3. Install frontend dependencies
 

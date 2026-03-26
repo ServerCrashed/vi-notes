@@ -3,8 +3,21 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { getDb } from '../db.js';
 import { toNewUserDoc, type UserDoc, USERS_COLLECTION } from '../models/user.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
+const cookieName = process.env.AUTH_COOKIE_NAME || 'vi_notes_token';
+
+function getCookieSettings() {
+	const isProduction = process.env.NODE_ENV === 'production';
+	return {
+		httpOnly: true,
+		sameSite: 'lax' as const,
+		secure: isProduction,
+		maxAge: 7 * 24 * 60 * 60 * 1000,
+		path: '/',
+	};
+}
 
 router.post('/register', async (req, res) => {
 	const { email, password } = req.body as { email?: string; password?: string };
@@ -73,10 +86,30 @@ router.post('/login', async (req, res) => {
 		}
 
 		const token = jwt.sign({ userId: user._id.toHexString() }, jwtSecret, { expiresIn: '7d' });
-		res.json({ token });
+		res.cookie(cookieName, token, getCookieSettings());
+		res.json({ ok: true });
 	} catch {
 		res.status(500).json({ error: 'failed to log in' });
 	}
+});
+
+router.get('/session', authMiddleware, (req, res) => {
+	if (!req.userId) {
+		res.status(401).json({ error: 'Unauthorized' });
+		return;
+	}
+
+	res.json({ authenticated: true });
+});
+
+router.post('/logout', (_req, res) => {
+	res.clearCookie(cookieName, {
+		httpOnly: true,
+		sameSite: 'lax',
+		secure: process.env.NODE_ENV === 'production',
+		path: '/',
+	});
+	res.json({ ok: true });
 });
 
 export default router;

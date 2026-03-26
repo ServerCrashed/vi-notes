@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 const port = Number(process.env.PORT || 4000);
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
-app.use(cors({ origin: corsOrigin }));
+app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json());
 app.get('/api/health', (_req, res) => {
     res.json({ ok: true });
@@ -21,13 +21,10 @@ async function startServer() {
         console.log(`Backend server listening on http://localhost:${port}`);
     });
 }
-try {
-    startServer();
-}
-catch (error) {
+startServer().catch((error) => {
     console.error('Failed to start backend:', error);
     process.exit(1);
-}
+});
 process.on('SIGINT', async () => {
     await closeDb();
     process.exit(0);

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { SESSIONS_COLLECTION, toNewSessionDoc, toPasteEvent, } from '../models/session.js';
 const router = Router();
 router.use(authMiddleware);
 router.post('/start', async (req, res) => {
@@ -11,17 +12,8 @@ router.post('/start', async (req, res) => {
     }
     try {
         const db = getDb();
-        const sessions = db.collection('sessions');
-        const result = await sessions.insertOne({
-            _id: new ObjectId(),
-            userId: new ObjectId(req.userId),
-            startedAt: new Date(),
-            pasteEvents: [],
-            pasteStats: {
-                pasteCount: 0,
-                totalPastedChars: 0,
-            },
-        });
+        const sessions = db.collection(SESSIONS_COLLECTION);
+        const result = await sessions.insertOne(toNewSessionDoc(req.userId));
         res.status(201).json({ sessionId: result.insertedId.toHexString() });
     }
     catch {
@@ -47,11 +39,15 @@ router.post('/:id/paste', async (req, res) => {
     }
     try {
         const db = getDb();
-        const sessions = db.collection('sessions');
-        const pasteEvent = { t, pastedCharCount };
-        if (typeof pastedLineCount === 'number') {
-            pasteEvent.pastedLineCount = pastedLineCount;
+        const sessions = db.collection(SESSIONS_COLLECTION);
+        const pasteEventInput = {
+            t,
+            pastedCharCount,
+        };
+        if (pastedLineCount !== undefined) {
+            pasteEventInput.pastedLineCount = pastedLineCount;
         }
+        const pasteEvent = toPasteEvent(pasteEventInput);
         const result = await sessions.updateOne({ _id: new ObjectId(id), userId: new ObjectId(req.userId) }, {
             $push: { pasteEvents: pasteEvent },
             $inc: {
@@ -88,7 +84,7 @@ router.post('/:id/end', async (req, res) => {
     }
     try {
         const db = getDb();
-        const sessions = db.collection('sessions');
+        const sessions = db.collection(SESSIONS_COLLECTION);
         const setPayload = {
             endedAt: new Date(endedAt),
         };

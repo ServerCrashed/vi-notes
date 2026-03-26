@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
-import { endSession, recordPaste, startSession } from '../api/client';
+import { endSession, logoutUser, recordPaste, startSession } from '../api/client';
 
 type EditorPageProps = {
-  token: string;
   onLogout: () => void;
 };
 
-export default function EditorPage({ token, onLogout }: EditorPageProps) {
+export default function EditorPage({ onLogout }: EditorPageProps) {
   const [text, setText] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [pasteCount, setPasteCount] = useState(0);
@@ -32,7 +31,7 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
     setLoading(true);
 
     try {
-      const response = await startSession(token);
+      const response = await startSession();
       setSessionId(response.sessionId);
       setPasteCount(0);
       setTotalPastedChars(0);
@@ -54,7 +53,7 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
     try {
       const finalWordCount = wordCount;
 
-      await endSession(sessionId, token, {
+      await endSession(sessionId, {
         endedAt: Date.now(),
         finalCharCount: charCount,
         finalWordCount,
@@ -81,7 +80,7 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
     }
 
     try {
-      await recordPaste(sessionId, token, {
+      await recordPaste(sessionId, {
         t: Date.now(),
         pastedCharCount,
         pastedLineCount,
@@ -116,9 +115,12 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
           </button>
           <button
             className="btn btn-secondary btn-sm"
-            onClick={() => {
-              localStorage.removeItem('vi_notes_token');
-              onLogout();
+            onClick={async () => {
+              try {
+                await logoutUser();
+              } finally {
+                onLogout();
+              }
             }}
           >
             Logout
