@@ -2,28 +2,12 @@ import { Router } from 'express';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
 import { authMiddleware } from '../middleware/auth.js';
-
-interface PasteEvent {
-	t: number;
-	pastedCharCount: number;
-	pastedLineCount?: number;
-}
-
-interface SessionDoc {
-	_id: ObjectId;
-	userId: ObjectId;
-	startedAt: Date;
-	endedAt?: Date;
-	pasteEvents: PasteEvent[];
-	pasteStats: {
-		pasteCount: number;
-		totalPastedChars: number;
-	};
-	docStats?: {
-		finalCharCount?: number;
-		finalWordCount?: number;
-	};
-}
+import {
+	type SessionDoc,
+	SESSIONS_COLLECTION,
+	toNewSessionDoc,
+	toPasteEvent,
+} from '../models/session.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -36,18 +20,9 @@ router.post('/start', async (req, res) => {
 
 	try {
 		const db = getDb();
-		const sessions = db.collection<SessionDoc>('sessions');
+		const sessions = db.collection<SessionDoc>(SESSIONS_COLLECTION);
 
-		const result = await sessions.insertOne({
-			_id: new ObjectId(),
-			userId: new ObjectId(req.userId),
-			startedAt: new Date(),
-			pasteEvents: [],
-			pasteStats: {
-				pasteCount: 0,
-				totalPastedChars: 0,
-			},
-		});
+		const result = await sessions.insertOne(toNewSessionDoc(req.userId));
 
 		res.status(201).json({ sessionId: result.insertedId.toHexString() });
 	} catch {
@@ -84,12 +59,17 @@ router.post('/:id/paste', async (req, res) => {
 
 	try {
 		const db = getDb();
-		const sessions = db.collection<SessionDoc>('sessions');
+		const sessions = db.collection<SessionDoc>(SESSIONS_COLLECTION);
 
-		const pasteEvent: PasteEvent = { t, pastedCharCount };
-		if (typeof pastedLineCount === 'number') {
-			pasteEvent.pastedLineCount = pastedLineCount;
+		const pasteEventInput: { t: number; pastedCharCount: number; pastedLineCount?: number } = {
+			t,
+			pastedCharCount,
+		};
+		if (pastedLineCount !== undefined) {
+			pasteEventInput.pastedLineCount = pastedLineCount;
 		}
+
+		const pasteEvent = toPasteEvent(pasteEventInput);
 
 		const result = await sessions.updateOne(
 			{ _id: new ObjectId(id), userId: new ObjectId(req.userId) },
@@ -142,7 +122,7 @@ router.post('/:id/end', async (req, res) => {
 
 	try {
 		const db = getDb();
-		const sessions = db.collection<SessionDoc>('sessions');
+		const sessions = db.collection<SessionDoc>(SESSIONS_COLLECTION);
 
 		const setPayload: {
 			endedAt: Date;

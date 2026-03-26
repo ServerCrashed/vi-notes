@@ -1,15 +1,8 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
-
-interface UserDoc {
-	_id: ObjectId;
-	email: string;
-	passwordHash: string;
-	createdAt: Date;
-}
+import { toNewUserDoc, type UserDoc, USERS_COLLECTION } from '../models/user.js';
 
 const router = Router();
 
@@ -23,15 +16,15 @@ router.post('/register', async (req, res) => {
 
 	try {
 		const db = getDb();
-		const users = db.collection<UserDoc>('users');
+		const users = db.collection<UserDoc>(USERS_COLLECTION);
 
 		const passwordHash = await bcrypt.hash(password, 10);
-		await users.insertOne({
-			_id: new ObjectId(),
-			email: email.toLowerCase(),
-			passwordHash,
-			createdAt: new Date(),
-		});
+		await users.insertOne(
+			toNewUserDoc({
+				email,
+				passwordHash,
+			})
+		);
 
 		res.status(201).json({ ok: true });
 	} catch (error: unknown) {
@@ -65,7 +58,7 @@ router.post('/login', async (req, res) => {
 
 	try {
 		const db = getDb();
-		const users = db.collection<UserDoc>('users');
+		const users = db.collection<UserDoc>(USERS_COLLECTION);
 		const user = await users.findOne({ email: email.toLowerCase() });
 
 		if (!user) {
