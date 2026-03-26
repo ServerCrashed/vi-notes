@@ -154,7 +154,7 @@
 }
 
 #spacer {
-  height: 20px;
+  height: 10px;
   border-top: 1px solid var(--border);
   @media (max-width: 98%) {
     height: 10px;
@@ -181,6 +181,29 @@
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+.app-header {
+  display: flex;
+  width: 100%;
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #eeeeef;
+  
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.app-header-title:hover {
+  opacity: 0.7;
 }
 
 .auth-page {
@@ -218,6 +241,7 @@
   line-height: 1;
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  margin-bottom: 20px;
 }
 
 .btn:hover:not(:disabled) {
@@ -306,7 +330,7 @@
 
 .editor-textarea {
   width: 100%;
-  min-height: 68vh;
+  min-height: 66vh;
   resize: none;
   border: 1px solid #d1d5db;
   border-radius: 12px;
