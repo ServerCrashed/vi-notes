@@ -1,130 +1,143 @@
-# Vi-Notes
+# Vi-Notes (Fork / Partial Implementation)
 
-**Vi-Notes** is an authenticity verification platform designed to distinguish genuine human-written content from AI-generated or AI-assisted text. The system focuses on analyzing **writing behavior** alongside **statistical and linguistic characteristics** of the text to establish reliable authorship verification.
+This repository is forked from [vicharanashala/vi-notes](https://github.com/vicharanashala/vi-notes) and currently contains a partial implementation of the original vision.
 
-This repository represents the **design and conceptual foundation** for the Vi-Notes system.
+The focus here is an MVP web app for auth + writing sessions + paste metadata tracking, while preserving the larger authorship-verification direction of the upstream project.
 
----
+## Upstream Reference
 
-## Motivation
+- Original project: [https://github.com/vicharanashala/vi-notes](https://github.com/vicharanashala/vi-notes)
+- This repo: forked derivative with incremental implementation work
 
-With the widespread availability of AI writing tools, verifying true human authorship has become increasingly challenging. Most existing detection methods rely primarily on textual analysis, which can be inconsistent and easy to bypass.
+## Current Scope in This Fork
 
-Vi-Notes approaches this problem by combining:
-- Behavioral signals from the writing process
-- Statistical analysis of the written content
-- Correlation between how content is written and what is written
+Implemented (MVP-oriented):
+- User registration and login
+- JWT-based protected editor access
+- Writing session start/end lifecycle
+- Paste event metadata capture (counts/timing), not clipboard content
 
----
+Planned / partial / not fully implemented yet:
+- Full behavioral analysis engine
+- Statistical + ML authenticity scoring pipeline
+- Reporting and advanced verification workflows
 
-## Core Idea
+## Tech Stack in This Repo
 
-Human writing naturally includes:
-- Variable typing speeds
-- Pauses during thinking
-- Revisions during idea formation
-- Irregular sentence structures
-- A relationship between content complexity and editing frequency
+- Frontend: React + TypeScript + Vite
+- Backend: Node.js + Express + TypeScript
+- Database: MongoDB
 
-AI-generated or pasted text often lacks these behavioral signatures.
+## Clone Guide
 
-Vi-Notes is designed to capture and analyze these characteristics to assess authorship authenticity.
+```bash
+git clone https://github.com/<your-username>/vi-notes.git
+cd vi-notes
+```
 
----
+If you are working directly from the upstream instead of this fork:
 
-## Key Features
+```bash
+git clone https://github.com/vicharanashala/vi-notes.git
+cd vi-notes
+```
 
-### Writing Session Monitoring
-- Capture keystroke timing metadata (not raw key content)
-- Track pauses, deletions, edits, and writing flow
-- Detect pasted or externally inserted text blocks
+## Setup Guide
 
-### Behavioral Pattern Analysis
-- Pause distribution before sentences and paragraphs
-- Typing speed variance
-- Revision frequency relative to text complexity
-- Micro-pauses around punctuation and structural boundaries
+Prerequisites:
+- Node.js 20+
+- npm 10+
+- MongoDB running locally or via a remote URI
 
-### Textual Statistical Analysis
-- Sentence length variation
-- Vocabulary diversity metrics
-- Stylistic consistency analysis
-- Linguistic irregularities typical of human writing
+1. Install backend dependencies
 
-### Cross-Verification Engine
-- Correlate keyboard behavior with text evolution
-- Identify mismatches between behavioral data and content
-- Flag suspicious uniformity patterns
+```bash
+cd backend
+npm install
+```
 
-### Authenticity Reports
-- Confidence score for human authorship
-- Highlighted suspicious segments
-- Supporting behavioral and textual indicators
-- Shareable verification summaries
+2. Configure backend environment
 
----
+```bash
+cp .env.example .env
+```
 
-## Tech Stack (MERN Architecture)
+Set values in backend/.env:
+- MONGODB_URI
+- JWT_SECRET
+- PORT
+- CORS_ORIGIN
 
-### Frontend
-- React
-- TypeScript
-- Electron for desktop-level keyboard event access
+3. Install frontend dependencies
 
-### Backend
-- Node.js
-- Express.js
-- RESTful APIs for session handling and analysis
+```bash
+cd ../frontend
+npm install
+```
 
-### Database
-- MongoDB
-- Encrypted storage for writing sessions, keystroke metadata, and reports
+4. Configure frontend environment
 
-### Machine Learning
-- TensorFlow / PyTorch
-- Supervised learning for human vs AI-assisted writing
-- Unsupervised anomaly detection
-- NLP-based statistical signature analysis
+```bash
+cp .env.example .env
+```
 
----
+Set values in frontend/.env:
+- VITE_API_BASE_URL
 
-## Privacy & Ethics
+## Run Guide
 
-Vi-Notes is designed with privacy-first principles:
+Run backend:
 
-- No storage of raw keystroke content
-- Only timing, frequency, and structural metadata is collected
-- Encrypted data storage
-- User-controlled session tracking
-- Monitoring limited strictly to active writing sessions
+```bash
+cd backend
+npm run dev
+```
 
----
+Run frontend (new terminal):
 
-## Project Goals
+```bash
+cd frontend
+npm run dev
+```
 
-- Restore trust in written content authenticity
-- Differentiate between human-written, AI-assisted, and AI-generated text
-- Adapt detection methods as AI writing tools evolve
-- Maintain ethical, transparent, and privacy-conscious verification
+Default local URLs:
+- Frontend: http://localhost:5173
+- Backend: http://localhost:4000
 
----
+## Structure Guide
 
-## Repository Scope
+```text
+vi-notes/
+	backend/
+		src/
+			db.ts               # Mongo connection and lifecycle
+			server.ts           # Express app bootstrap
+			middleware/
+				auth.ts           # JWT auth middleware
+			models/
+				user.ts           # User model/types
+				session.ts        # Session + paste event model/types
+			routes/
+				auth.ts           # /api/auth endpoints
+				sessions.ts       # /api/sessions endpoints
+	frontend/
+		src/
+			api/
+				client.ts         # Frontend API wrapper
+			components/
+				Header.tsx        # Shared header component
+				ProtectedRoute.tsx
+			pages/
+				Login.tsx
+				Register.tsx
+				Editor.tsx
+			App.tsx             # Routes and auth state wiring
+			App.css             # Shared styling
+```
 
-This repository currently serves as:
-- A design reference
-- A research and experimentation space
-- A foundation for future MERN-based implementation
+## Privacy Notes
 
----
-
-## Contributing
-
-Contributions are welcome, especially for **feature requests and their implementation**.  
-If you are interested in working on an existing feature request or proposing a new one, please open or comment on an issue to start the discussion.
-
----
-
-## License
-
-This project is licensed under the MIT License.
+This fork follows privacy-first constraints for MVP behavior tracking:
+- No raw clipboard content is stored
+- No raw keystroke content is stored
+- Only metadata required for session behavior analysis is captured
