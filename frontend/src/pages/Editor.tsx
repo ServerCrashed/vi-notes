@@ -15,6 +15,17 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
   const [loading, setLoading] = useState(false);
 
   const canEndSession = useMemo(() => Boolean(sessionId) && !loading, [sessionId, loading]);
+  const canResetPastedStats = useMemo(() => !sessionId && !loading, [sessionId, loading]);
+  const charCount = useMemo(() => text.length, [text]);
+  const wordCount = useMemo(() => (text.trim() ? text.trim().split(/\s+/).length : 0), [text]);
+  const paragraphCount = useMemo(() => {
+    const trimmed = text.trim();
+    if (!trimmed) {
+      return 0;
+    }
+
+    return trimmed.split(/\n\s*\n+/).length;
+  }, [text]);
 
   const handleStartSession = async () => {
     setError('');
@@ -41,12 +52,11 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
     setLoading(true);
 
     try {
-      const trimmed = text.trim();
-      const finalWordCount = trimmed ? trimmed.split(/\s+/).length : 0;
+      const finalWordCount = wordCount;
 
       await endSession(sessionId, token, {
         endedAt: Date.now(),
-        finalCharCount: text.length,
+        finalCharCount: charCount,
         finalWordCount,
       });
 
@@ -82,43 +92,58 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
   };
 
   return (
-    <main style={{ maxWidth: 840, margin: '2rem auto', padding: '1rem' }}>
-      <h1>Editor</h1>
+    <main className="editor-page">
+      <header className="editor-header">
+        <h1 className="editor-title">Vi-Notes</h1>
 
-      <div className="editor-toolbar">
-        <button className="btn btn-primary" onClick={handleStartSession} disabled={Boolean(sessionId) || loading}>
-          Start Session
-        </button>
-        <button className="btn btn-danger" onClick={handleEndSession} disabled={!canEndSession}>
-          End Session
-        </button>
-        <button
-          className="btn btn-secondary"
-          onClick={() => {
-            localStorage.removeItem('vi_notes_token');
-            onLogout();
-          }}
-        >
-          Logout
-        </button>
-      </div>
+        <div className="editor-toolbar">
+          <button className="btn btn-primary btn-sm" onClick={handleStartSession} disabled={Boolean(sessionId) || loading}>
+            Start Session
+          </button>
+          <button className="btn btn-danger btn-sm" onClick={handleEndSession} disabled={!canEndSession}>
+            End Session
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              setPasteCount(0);
+              setTotalPastedChars(0);
+            }}
+            disabled={!canResetPastedStats}
+            title={sessionId ? 'End session before resetting pasted stats' : 'Reset pasted stats'}
+          >
+            Reset Pasted Stats
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              localStorage.removeItem('vi_notes_token');
+              onLogout();
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+      <section id="spacer"></section>
 
-      <p>
-        Active Session: {sessionId ?? 'None'}
-        <br />
-        Paste Count: {pasteCount}
-        <br />
-        Total Pasted Chars: {totalPastedChars}
-      </p>
+      <section className="editor-stats">
+        <p>Active Session: {sessionId ?? 'None'}</p>
+        <p>Paste Count: {pasteCount}</p>
+        <p>Total Pasted Chars: {totalPastedChars}</p>
+        <p>Characters: {charCount}</p>
+        <p>Words: {wordCount}</p>
+        <p>Paragraphs: {paragraphCount}</p>
+      </section>
 
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
+      {error && <p className="auth-error">{error}</p>}
 
       <textarea
+        className="editor-textarea"
         value={text}
         onChange={(event) => setText(event.target.value)}
         onPaste={handlePaste}
         placeholder="Start writing..."
-        style={{ width: '100%', minHeight: 360, resize: 'vertical' }}
       />
     </main>
   );

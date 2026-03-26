@@ -154,10 +154,10 @@
 }
 
 #spacer {
-  height: 88px;
+  height: 20px;
   border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
+  @media (max-width: 98%) {
+    height: 10px;
   }
 }
 
@@ -260,4 +260,66 @@
   gap: 0.6rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.editor-page {
+  width: 100%;
+  margin: 0;
+  padding: 1rem 1rem 1.25rem;
+  box-sizing: border-box;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.editor-title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+}
+
+.editor-header .editor-toolbar {
+  margin-bottom: 0;
+  justify-content: flex-end;
+}
+
+.editor-stats {
+  margin-bottom: 0.3rem;
+  text-align: left;
+  font-size: 0.75rem;
+  user-select: none;
+  line-height: 2;
+}
+
+.editor-stats p {
+  margin: 0.1 rem 0;
+}
+
+.editor-textarea {
+  width: 100%;
+  min-height: 68vh;
+  resize: none;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 0.9rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #0f172a;
+  caret-color: #0f172a;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.editor-textarea:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
 }
