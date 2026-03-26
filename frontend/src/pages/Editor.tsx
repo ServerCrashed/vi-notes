@@ -85,14 +85,15 @@ export default function EditorPage({ token, onLogout }: EditorPageProps) {
     <main style={{ maxWidth: 840, margin: '2rem auto', padding: '1rem' }}>
       <h1>Editor</h1>
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-        <button onClick={handleStartSession} disabled={Boolean(sessionId) || loading}>
+      <div className="editor-toolbar">
+        <button className="btn btn-primary" onClick={handleStartSession} disabled={Boolean(sessionId) || loading}>
           Start Session
         </button>
-        <button onClick={handleEndSession} disabled={!canEndSession}>
+        <button className="btn btn-danger" onClick={handleEndSession} disabled={!canEndSession}>
           End Session
         </button>
         <button
+          className="btn btn-secondary"
           onClick={() => {
             localStorage.removeItem('vi_notes_token');
             onLogout();

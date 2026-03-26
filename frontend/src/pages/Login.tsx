@@ -31,32 +31,36 @@ export default function LoginPage({ onLoggedIn }: LoginPageProps) {
   };
 
   return (
-    <main style={{ maxWidth: 420, margin: '3rem auto', padding: '1rem' }}>
+    <main className="auth-page">
       <h1>Login</h1>
       <form onSubmit={onSubmit}>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '1rem' }}
-        />
+        <div className="auth-form-row">
+          <label htmlFor="email" className="auth-form-label">Email:</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+            className="auth-form-input"
+          />
+        </div>
 
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '1rem' }}
-        />
+        <div className="auth-form-row">
+          <label htmlFor="password" className="auth-form-label">Password:</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            className="auth-form-input"
+          />
+        </div>
 
-        {error && <p style={{ color: 'crimson' }}>{error}</p>}
+        {error && <p className="auth-error">{error}</p>}
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" disabled={loading} className="btn btn-primary">
           {loading ? 'Signing in...' : 'Login'}
         </button>
       </form>
