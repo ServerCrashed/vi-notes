@@ -2,8 +2,14 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../api/client';
 import Header from '../components/Header';
+import type { ThemeMode } from '../theme';
 
-export default function RegisterPage() {
+type RegisterPageProps = {
+  themeMode: ThemeMode;
+  onToggleTheme: () => void;
+};
+
+export default function RegisterPage({ themeMode, onToggleTheme }: RegisterPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +33,7 @@ export default function RegisterPage() {
 
   return (
     <>
-      <Header />
+      <Header themeMode={themeMode} onToggleTheme={onToggleTheme} />
       <main className="auth-page">
         <h1>Register</h1>
         <form onSubmit={onSubmit}>

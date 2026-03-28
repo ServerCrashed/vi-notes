@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
 import { endSession, logoutUser, recordPaste, startSession } from '../api/client';
+import type { ThemeMode } from '../theme';
 
 type EditorPageProps = {
   onLogout: () => void;
+  themeMode: ThemeMode;
+  onToggleTheme: () => void;
 };
 
-export default function EditorPage({ onLogout }: EditorPageProps) {
+export default function EditorPage({ onLogout, themeMode, onToggleTheme }: EditorPageProps) {
   const [text, setText] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [pasteCount, setPasteCount] = useState(0);
@@ -124,6 +127,12 @@ export default function EditorPage({ onLogout }: EditorPageProps) {
             }}
           >
             Logout
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={onToggleTheme}
+          >
+            {themeMode === 'light' ? 'Dark Mode' : 'Light Mode'}
           </button>
         </div>
       </header>

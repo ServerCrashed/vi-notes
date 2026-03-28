@@ -182,7 +182,11 @@
 
 .app-header {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
   padding: 1.5rem 1rem;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
@@ -202,6 +206,35 @@
 
 .app-header-title:hover {
   opacity: 0.7;
+}
+
+.theme-toggle-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-h);
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.theme-toggle-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--social-bg);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
 }
 
 .auth-page {

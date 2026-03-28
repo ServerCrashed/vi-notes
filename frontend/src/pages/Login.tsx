@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../api/client';
 import Header from '../components/Header';
+import type { ThemeMode } from '../theme';
 
 type LoginPageProps = {
   onLoggedIn: () => void;
+  themeMode: ThemeMode;
+  onToggleTheme: () => void;
 };
 
-export default function LoginPage({ onLoggedIn }: LoginPageProps) {
+export default function LoginPage({ onLoggedIn, themeMode, onToggleTheme }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -32,7 +35,7 @@ export default function LoginPage({ onLoggedIn }: LoginPageProps) {
 
   return (
     <>
-      <Header />
+      <Header themeMode={themeMode} onToggleTheme={onToggleTheme} />
       <main className="auth-page">
         <h1>Login</h1>
     <form onSubmit={onSubmit}>
