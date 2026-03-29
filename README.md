@@ -68,6 +68,9 @@ Set values in backend/.env:
 - PORT
 - CORS_ORIGIN
 - AUTH_COOKIE_NAME (optional)
+- AUTH_COOKIE_SAME_SITE (`lax` by default; use `none` for cross-site frontend/backend)
+- AUTH_COOKIE_SECURE (`true` in HTTPS production; required when SameSite is `none`)
+- AUTH_COOKIE_DOMAIN (optional, useful for shared domain deployments)
 
 3. Install frontend dependencies
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../api/client';
+import { checkSession, loginUser } from '../api/client';
 import Header from '../components/Header';
 import type { ThemeMode } from '../theme';
 
@@ -24,10 +24,16 @@ export default function LoginPage({ onLoggedIn, themeMode, onToggleTheme }: Logi
 
     try {
       await loginUser(email, password);
+      await checkSession();
       onLoggedIn();
       navigate('/editor');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      const message = err instanceof Error ? err.message : 'Login failed';
+      setError(
+        message.includes('Unauthorized')
+          ? 'Login succeeded but session cookie was not accepted. Check CORS_ORIGIN and ensure you are using an allowed frontend URL.'
+          : message
+      );
     } finally {
       setLoading(false);
     }

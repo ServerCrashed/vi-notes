@@ -10,12 +10,26 @@ const cookieName = process.env.AUTH_COOKIE_NAME || 'vi_notes_token';
 
 function getCookieSettings() {
 	const isProduction = process.env.NODE_ENV === 'production';
+	const configuredSameSite = (process.env.AUTH_COOKIE_SAME_SITE || 'lax').toLowerCase();
+	const sameSite: 'lax' | 'strict' | 'none' =
+		configuredSameSite === 'none'
+			? 'none'
+			: configuredSameSite === 'strict'
+				? 'strict'
+				: 'lax';
+	const secure =
+		process.env.AUTH_COOKIE_SECURE !== undefined
+			? process.env.AUTH_COOKIE_SECURE === 'true'
+			: isProduction || sameSite === 'none';
+	const domain = process.env.AUTH_COOKIE_DOMAIN;
+
 	return {
 		httpOnly: true,
-		sameSite: 'lax' as const,
-		secure: isProduction,
+		sameSite,
+		secure,
 		maxAge: 7 * 24 * 60 * 60 * 1000,
 		path: '/',
+		...(domain ? { domain } : {}),
 	};
 }
 
@@ -103,12 +117,8 @@ router.get('/session', authMiddleware, (req, res) => {
 });
 
 router.post('/logout', (_req, res) => {
-	res.clearCookie(cookieName, {
-		httpOnly: true,
-		sameSite: 'lax',
-		secure: process.env.NODE_ENV === 'production',
-		path: '/',
-	});
+	const { maxAge: _maxAge, ...cookieSettings } = getCookieSettings();
+	res.clearCookie(cookieName, cookieSettings);
 	res.json({ ok: true });
 });
 

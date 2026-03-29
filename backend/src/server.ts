@@ -9,9 +9,36 @@ dotenv.config();
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
-const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const defaultAllowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
 
-app.use(cors({ origin: corsOrigin, credentials: true }));
+function normalizeOrigin(origin: string): string {
+	return origin.trim().replace(/\/+$/, '');
+}
+
+const allowedOrigins = process.env.CORS_ORIGIN
+	? process.env.CORS_ORIGIN.split(',').map(normalizeOrigin).filter(Boolean)
+	: defaultAllowedOrigins.map(normalizeOrigin);
+
+app.use(
+	cors({
+		origin(origin, callback) {
+			if (!origin) {
+				callback(null, true);
+				return;
+			}
+
+			const normalizedOrigin = normalizeOrigin(origin);
+
+			if (allowedOrigins.includes(normalizedOrigin)) {
+				callback(null, true);
+				return;
+			}
+
+			callback(new Error(`Origin ${origin} is not allowed by CORS`));
+		},
+		credentials: true,
+	})
+);
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
